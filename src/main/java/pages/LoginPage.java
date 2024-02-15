@@ -27,9 +27,12 @@ public class LoginPage extends PageBase{
 		
 		//Login Function//
 		public void SiginProcess(String Username, String Pass)
-		{	
+		{
+			waitElementToBeVisibleAndClickable(username_TxtField);
 			setTextElementText(username_TxtField, Username);
+			waitElementToBeVisibleAndClickable(Password_TxtField);
 			setTextElementText(Password_TxtField, Pass);
+			waitElementToBeClickable(Signin_btn);
 			clickButton(Signin_btn);
 		}
 }
