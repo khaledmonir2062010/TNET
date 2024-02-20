@@ -1,5 +1,6 @@
 package tests;
 
+import java.sql.*;
 import java.util.HashMap;
 
 import org.openqa.selenium.WebDriver;
@@ -18,8 +19,10 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import utilities.Helper;
 
 public class TestBase {
+    static Connection connection = null;
+    static Statement statement;
+    static ResultSet rs;
     public static WebDriver driver;
-
     public static String downloadPath = System.getProperty("user.dir") + "\\Downloads";
     public static String env;
     public static String baseURL;
@@ -76,10 +79,10 @@ public class TestBase {
         }
     }
 
-//    @AfterSuite
-//    public void stopDriver() {
-//        driver.quit();
-//    }
+    @AfterSuite
+    public void stopDriver() {
+        driver.quit();
+    }
 
     // take screenshot when test case fail and add it in the Screenshot folder
     @AfterMethod
@@ -89,6 +92,36 @@ public class TestBase {
             System.out.println("Taking Screenshot....");
             Helper.captureScreenshot(driver, result.getName());
         }
+    }
 
+    @BeforeMethod
+    public void setUpOracleDBConnection() {
+
+        String databaseURL = "jdbc:oracle:thin:@knet-srv:1522:QEDB1";
+        String user = "TRADESUPER";
+        String password = "NewEmptyTN";
+//        connection = null;
+        try {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+            System.out.println("Connecting to Database...");
+            connection = DriverManager.getConnection(databaseURL, user, password);
+            if (connection != null) {
+                System.out.println("Connected to the Database...");
+            }
+        } catch (SQLException | ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        if (connection != null) {
+            try {
+                System.out.println("Closing Database Connection...");
+                connection.close();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 }

@@ -7,10 +7,10 @@ import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import pages.LoginPage;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 
 
 public class LoginTest extends TestBase {
@@ -40,13 +40,39 @@ public class LoginTest extends TestBase {
     }
 
     @Test(priority = 1 , dataProvider = "Login")
-    public void Successfull_Login(String UserName , String PassWord) {
+    public void Successful_Login(String UserName , String PassWord) {
 
         //Step_1: Enter the email and password to login
         Loginobj = new LoginPage(driver);
 
         Loginobj.SiginProcess(UserName , PassWord);
         Assert.assertEquals(driver.getCurrentUrl(), Expected_HomePageURL);
+        Loginobj.signOut();
+        Assert.assertTrue(Loginobj.username_TxtField.isDisplayed());
+    }
+
+    @Test
+    public void getDataFromDataBase() {
+        try {
+
+            String query = "SELECT * FROM TRADESUPER.SM_DERIVATIVES_FUTURE";
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+
+ //  --------------------------- Get All Rows from the Table
+            while (rs.next()) {
+                String MarketID = rs.getString(1);
+                System.out.println("Market ID : " + MarketID);
+                String ProductID = rs.getString(2);
+                System.out.println("Product ID : " + ProductID);
+                String ContractID = rs.getString(3);
+                System.out.println("Contract ID : " + ContractID);
+                int ContractSize = rs.getInt(4);
+                System.out.println("Contract Size : " + ContractSize);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 }
 
